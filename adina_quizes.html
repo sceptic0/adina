@@ -1,0 +1,208 @@
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+          integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    <style>
+        #total-points {
+            width: 10px;
+            margin-bottom: 200px;
+            font-size: 40px;
+        }
+
+        #submit-button {
+            margin-top: 200px;
+            float: right;
+        }
+        .icon{position:absolute;right:0;top:5px; font-family: "Rage Italic"; padding-right:12px;}
+        .valori{
+            position:relative;
+            margin-top: 25px;
+        }
+        .card-text-styled {
+            font-family: Algerian;
+        }
+        .card-body-styled {
+            padding: 3.15rem;
+            background: indianred;
+        }
+        ul {
+            font-style: italic;
+            font-family: "Rage Italic", sans-serif;
+            font-size: 18px;
+
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-lg-center">
+        <div class="col col-lg-2">
+            <span id="total-points">0</span><strong> points</strong>
+        </div>
+    </div>
+    <form id="quiz">
+        <div id="content"></div>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+        crossorigin="anonymous"></script>
+<script>
+
+  let quiz = [
+    {
+      question: 'what is the result of 1 + 1 ?',
+      answer: 2,
+      points: 1,
+      bonus: null
+    },
+    {
+      question: 'what is the result of 1 multiplied by 0 ?',
+      answer: 0,
+      points: 10,
+      bonus: null
+    },
+    {
+      question: 'what is the result of 1 divided by 0 ?',
+      answer: 0,
+      points: 20,
+      bonus: 30
+    },
+    {
+      question: 'what is the result of 12 multiplied by 55 ?',
+      answer: 660,
+      points: 5,
+      bonus: 10
+    }
+  ];
+  let targetDiv = document.getElementById('content')
+  let form = document.getElementById('quiz')
+
+  function generateHtml(quizes) {
+    let html = '';
+    let counter = 0;
+    // <div class="card" style="width: 18rem;">
+    //   <img src="..." className="card-img-top" alt="...">
+    //     <div class="card-body">
+    //       <h5 className="card-title">Card title</h5>
+    //       <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+    //         content.</p>
+    //       <a href="#" className="btn btn-primary">Go somewhere</a>
+    //     </div>
+    // </div>
+    for (let object of quizes) {
+      counter++;
+
+      html += `<div class="card valori row">`
+      html += `<div class="icon">`
+      html += `<ul>`
+      html += `<li class="li-styled">Points: ${object.points}</li>`
+
+      if (object.bonus) html += `<li class="li-styled">Bonus: ${object.bonus}</li>`
+      html += `</ul>`
+      html += `</div>`
+      html += `<div class="card-body-styled">`
+      html += `<h5 class="card-text card-text-styled">${counter}. ${object.question}</h5>`
+      html += `<p class="card-text">` +
+        `<input type="text" class="form-control" name="answer_${counter}">` +
+        '</p>'
+      html += '</div>'
+      html += '</div>'
+    }
+    html += `<button class="btn btn-warning" type="submit" id="submit-button">How was your test? Click here to find out</button>`
+    targetDiv.insertAdjacentHTML('beforeend', html);
+  }
+
+  generateHtml(quiz)
+
+  let submitButton = document.getElementById('submit-button')
+
+  submitButton.addEventListener('click', (e) => {
+    e.preventDefault();
+    let formData = new FormData(form)
+    let counter = 1;
+   // let answers = []
+   // let answer = {}
+    let userPoints = 0;
+    // [ OLD ]
+
+
+    // for (let object of quiz) {
+    //   answer.question = object.question
+    //   answer.result = formData.get(`answer_${counter}`)
+    //   answers.push(answer)
+    //   answer = {}
+    //   counter++;
+    // }
+    // for (let answer of answers) {
+    //   let getQuizData = quiz.find(quiz => quiz.question == answer.question)
+    //   if (answer.result) {
+    //     if (getQuizData.answer == answer.result) {
+    //       userPoints += getQuizData.points
+    //       if (getQuizData.bonus !== null) {
+    //         userPoints += getQuizData.bonus
+    //       }
+    //     }
+    //   }
+    // }
+
+
+   // [ NEW ]
+    for (let object of quiz) {
+      let myResponseTrimmed = formData.get(`answer_${counter}`).trim()
+      if (myResponseTrimmed) {
+        if (object.answer == myResponseTrimmed) {
+          userPoints += object.points
+          if (object.bonus !== null) {
+            userPoints += object.bonus
+          }
+        }
+      }
+      counter++;
+    }
+    let totalPointsElement = document.getElementById('total-points')
+    if (userPoints !== 0) {
+      totalPointsElement.innerText = userPoints
+      totalPointsElement.style.color = 'red'
+    }
+  })
+
+
+  // incepem de la o colectie de intrebari
+  // fiecare intrebare are: titlul intrebarii, raspunsul corect(answer), numarul de puncte daca userul da raspunsul corect si un bonus, in functie
+  // de dificultatea intrabarii
+  // liniile 51-68
+  // mi-am creat o functie care primeste colectia noastra de intrebari ca parametru "generateHtml(quizes)"
+  // mi-am creat o variabila care sa contina tot html=ul generat in functia de mai sus. particularitatea unui <form> este aceea de a avea unul sau mai multe inputuri:(<input>)
+  // fiecarui input i-am pus dinamic un "name" pe care il vom folosi la extragerea datelor din formular
+  // la sfarsitul html-ului generat dinamic(am parcurs fiecare intrebare), am adaugat in html-ul nostru un button, caruia i-am atribuit un id "submit-button"
+  // dupa toate astea, am appenduit in dom(pagina), html-ul generat dinamic- linia 65
+  // linia 68 - am chemat functia generateHtml() cu parametru quizz pentru a-mi genera continut dinamic in pagina
+  //linia 70 - captam butonul de submit al formularului
+  // pe acest buton adaugam un eveniment de tip "click"- linia 72
+  // linia 73- particularitatea unui buton este aceea de a face submit formularului, iar noi trebuie sa-l oprim din executie.
+  // luam toate inputurile din formular-linia 74
+  // folosim un array pentru a stoca toate raspusurile noastre - linia 76
+  // pentru fiecare raspuns, folosim un obiect, pentru a stoca: "question" care este unica pentru fiecare intrebare si raspunsul nostru(linile 80-81)
+  // userPoints - va fi numarul total de puncte a userului, la final. default are valoarea 0 -linia 78
+  // ne folosim de variabila counter, care porneste de la 1 si se incrementeaza de fiecare data, la parcurgerea intrebarilor, la final-foarte important
+  // ea ne este necesara pentru a lua valorile inputurilor : daca te uiti cu inspect element pe fiecare input din formular vei obeserva ca ele au un atribut de tipul
+  // name cu o valoare dinamica: "answer_1", "answer_2"... - linia 81
+  // dam push la obiectul answer format de noi, care contine proprietatile "result" si "question" - linia 82
+  // golim obiectul nostru- linia 83
+  // incrementam counter - linia 84
+  // NExt STEP
+  // iteram prin fiecare raspuns
+  // gasim intrebarea din array-ul initial "quiz" dupa proprietatea "question"
+  // daca raspusul la intrebare coincide cu raspunsul nostru, atunci adauga punctele specifice acelei intrebari, iar daca are bonus, adauga si bonusul
+  // linia 97, targhetam elementul din dom cu id-ul total-points, pentru a-i schimba valoarea. userul la inceput are 0 puncte....
+  //  afisam noul punctaj (linia 99) doar daca este diferit de 0 (linia 98)!
+  // linia 100 - schimbam culoarea punctajului in rosu, negru-initial
+
+
+</script>
+</body>
+</html>
